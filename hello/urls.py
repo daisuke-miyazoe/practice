@@ -11,4 +11,7 @@ urlpatterns = [
     path('list', FriendList.as_view()), #☆
     path('detail/<int:pk>', FriendDetail.as_view()), #☆
     path('find', views.find, name='find'),
+    path('<int:num>', views.index, name='index'),
+    path('message/', views.message, name='message'),
+    path('message/<int:page>', views.message, name='message'),
 ]

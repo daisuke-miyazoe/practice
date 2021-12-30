@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Friend
-from .forms import FriendForm
+from .models import Friend, Message
+from .forms import FriendForm, MessageForm
 from django.views.generic import ListView
 from django.views.generic import DetailView
 from .forms import FindForm
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 def __new_str__(self):
     result = ''
@@ -16,12 +17,13 @@ def __new_str__(self):
         result += '</tr>'
     return result
 
-def index(request):
-    data = Friend.objects.all().order_by('age').reverse()    #☆
+def index(request, num=1):
+    data = Friend.objects.all()
+    page = Paginator(data, 3)
     params = {
         'title': 'Hello',
         'message':'',
-        'data': data,
+        'data': page.get_page(num),
     }
     return render(request, 'hello/index.html', params)
 
@@ -87,3 +89,16 @@ def find(request):
     }
     return render(request, 'hello/find.html', params)
 
+def message(request, page=1):
+    if(request.method == 'POST'):
+        obj = Message()
+        form = MessageForm(request.POST, instance=obj)
+        form.save()
+    data = Message.objects.all().reverse()
+    paginator = Paginator(data, 5)
+    params = {
+        'title': 'Message',
+        'form': MessageForm(),
+        'data': paginator.get_page(page),
+    }
+    return render(request, 'hello/message.html', params)
